@@ -223,7 +223,7 @@ def updateScore(fanhao):
     sql_update = "UPDATE av_record SET score ='" + str(score) + "' WHERE ID ='" + fanhao + "'"
     cur.execute(sql_update)
     conn.commit()
-    print('该番号更新得分为' + str(score))  
+    print('该番号更新得分为' + str(score))
 
     cur.close()
     conn.close()

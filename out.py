@@ -15,7 +15,7 @@ class CommentDialog(wx.Dialog):
         super(CommentDialog, self).__init__(parent, title=fanhao)
         panel = wx.Panel(self)
         self.conSizer = wx.BoxSizer(wx.VERTICAL)
-        self.sizer = wx.GridSizer(9,3,5,5)
+        self.sizer = wx.GridSizer(3,1,5,5)
         self.fanhao = fanhao
         #初始化获取信息
         def mdb_conn(password=""):
@@ -27,315 +27,324 @@ class CommentDialog(wx.Dialog):
 
         conn = mdb_conn()
         cur = conn.cursor()
+        self.score = 0
+        # 得分这个小框
+        boxScore = wx.BoxSizer(wx.HORIZONTAL)
 
-        sql_sel = "SELECT genre FROM av_genres WHERE type =1 "
-        cur.execute(sql_sel)
-        genre_info = cur.fetchall()
-        print(genre_info)
-
-        # 主题这个小框
-        zhuti = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.listZhuti = ['']
-        self.getListZhuti()
-        self.comboZhuti = wx.ComboBox(self, choices=self.listZhuti, size=(100,10),style=wx.CB_READONLY)
-        self.comboZhuti.SetSelection(0)
-
-        self.zhuti_scoreList = ['-2', '-1', '0', '1', '2', '3']
-        self.zhuti_scorebox = wx.RadioBox(self, label='主题', choices=self.zhuti_scoreList,
+        self.scoreList = ['0','1', '2', '3', '4', '5']
+        self.scorebox = wx.RadioBox(self, label='得分', choices=self.scoreList,
                                majorDimension=1, style=wx.RA_SPECIFY_ROWS)
-        zhuti.Add(self.comboZhuti, 0, wx.ALL | wx.EXPAND, 20)
-        zhuti.Add(self.zhuti_scorebox, 0, wx.ALL | wx.EXPAND, 5)
-        self.sizer.Add(zhuti)
+        self.scorebox.Bind(wx.EVT_RADIOBOX, self.OnRadiogroupScore)
+        boxScore.Add(self.scorebox, 0, wx.ALL | wx.EXPAND, 5)
+        self.sizer.Add(boxScore)
+        # sql_sel = "SELECT genre FROM av_genres WHERE type =1 "
+        # cur.execute(sql_sel)
+        # genre_info = cur.fetchall()
+        # print(genre_info)
 
-        # 角色这个小框
-        Juese = wx.BoxSizer(wx.HORIZONTAL)
+        # # 主题这个小框
+        # zhuti = wx.BoxSizer(wx.HORIZONTAL)
+        #
+        # self.listZhuti = ['']
+        # self.getListZhuti()
+        # self.comboZhuti = wx.ComboBox(self, choices=self.listZhuti, size=(100,10),style=wx.CB_READONLY)
+        # self.comboZhuti.SetSelection(0)
+        #
+        # self.zhuti_scoreList = ['-2', '-1', '0', '1', '2', '3']
+        # self.zhuti_scorebox = wx.RadioBox(self, label='主题', choices=self.zhuti_scoreList,
+        #                        majorDimension=1, style=wx.RA_SPECIFY_ROWS)
+        # zhuti.Add(self.comboZhuti, 0, wx.ALL | wx.EXPAND, 20)
+        # zhuti.Add(self.zhuti_scorebox, 0, wx.ALL | wx.EXPAND, 5)
+        # self.sizer.Add(zhuti)
 
-        self.listJuese = ['']
-        self.getListJuese()
-        self.comboJuese = wx.ComboBox(self, choices=self.listJuese, size=(100,10),style=wx.CB_READONLY)
-        self.comboJuese.SetSelection(0)
+        # # 角色这个小框
+        # Juese = wx.BoxSizer(wx.HORIZONTAL)
+        #
+        # self.listJuese = ['']
+        # self.getListJuese()
+        # self.comboJuese = wx.ComboBox(self, choices=self.listJuese, size=(100,10),style=wx.CB_READONLY)
+        # self.comboJuese.SetSelection(0)
+        #
+        # self.Juese_scoreList = ['-2', '-1', '0', '1', '2', '3']
+        # self.Juese_scorebox = wx.RadioBox(self, label='角色', choices=self.Juese_scoreList,
+        #                                   majorDimension=1, style=wx.RA_SPECIFY_ROWS)
+        # Juese.Add(self.comboJuese, 0, wx.ALL | wx.EXPAND, 20)
+        # Juese.Add(self.Juese_scorebox, 0, wx.ALL | wx.EXPAND, 5)
+        # self.sizer.Add(Juese)
 
-        self.Juese_scoreList = ['-2', '-1', '0', '1', '2', '3']
-        self.Juese_scorebox = wx.RadioBox(self, label='角色', choices=self.Juese_scoreList,
-                                          majorDimension=1, style=wx.RA_SPECIFY_ROWS)
-        Juese.Add(self.comboJuese, 0, wx.ALL | wx.EXPAND, 20)
-        Juese.Add(self.Juese_scorebox, 0, wx.ALL | wx.EXPAND, 5)
-        self.sizer.Add(Juese)
-
-        # 服装这个小框
-        Fuzhuang = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.listFuzhuang = ['']
-        self.getListFuzhuang()
-        self.comboFuzhuang = wx.ComboBox(self, choices=self.listFuzhuang, size=(100,10),style=wx.CB_READONLY)
-        self.comboFuzhuang.SetSelection(0)
-
-        self.Fuzhuang_scoreList = ['-2', '-1', '0', '1', '2', '3']
-        self.Fuzhuang_scorebox = wx.RadioBox(self, label='服装', choices=self.Fuzhuang_scoreList,
-                                          majorDimension=1, style=wx.RA_SPECIFY_ROWS)
-        Fuzhuang.Add(self.comboFuzhuang, 0, wx.ALL | wx.EXPAND, 20)
-        Fuzhuang.Add(self.Fuzhuang_scorebox, 0, wx.ALL | wx.EXPAND, 5)
-        self.sizer.Add(Fuzhuang)
-
-        # 体型这个小框
-        Tixing = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.listTixing = ['']
-        self.getListTixing()
-        self.comboTixing = wx.ComboBox(self, choices=self.listTixing, size=(100,10),style=wx.CB_READONLY)
-        self.comboTixing.SetSelection(0)
-
-        self.Tixing_scoreList = ['-2', '-1', '0', '1', '2', '3']
-        self.Tixing_scorebox = wx.RadioBox(self, label='体型', choices=self.Tixing_scoreList,
-                                             majorDimension=1, style=wx.RA_SPECIFY_ROWS)
-        Tixing.Add(self.comboTixing, 0, wx.ALL | wx.EXPAND,20)
-        Tixing.Add(self.Tixing_scorebox, 0, wx.ALL | wx.EXPAND, 5)
-        self.sizer.Add(Tixing)
-
-        # 行为这个小框
-        Xingwei = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.listXingwei = ['']
-        self.getListXingwei()
-        self.comboXingwei = wx.ComboBox(self, choices=self.listXingwei, size=(100,10),style=wx.CB_READONLY)
-        self.comboXingwei.SetSelection(0)
-
-        self.Xingwei_scoreList = ['-2', '-1', '0', '1', '2', '3']
-        self.Xingwei_scorebox = wx.RadioBox(self, label='行为', choices=self.Xingwei_scoreList,
-                                           majorDimension=1, style=wx.RA_SPECIFY_ROWS)
-        Xingwei.Add(self.comboXingwei, 0, wx.ALL | wx.EXPAND, 20)
-        Xingwei.Add(self.Xingwei_scorebox, 0, wx.ALL | wx.EXPAND, 5)
-        self.sizer.Add(Xingwei)
-
-        # 玩法这个小框
-        Wanfa = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.listWanfa = ['']
-        self.getListWanfa()
-        self.comboWanfa = wx.ComboBox(self, choices=self.listWanfa, size=(100,10),style=wx.CB_READONLY)
-        self.comboWanfa.SetSelection(0)
-
-        self.Wanfa_scoreList = ['-2', '-1', '0', '1', '2', '3']
-        self.Wanfa_scorebox = wx.RadioBox(self, label='玩法', choices=self.Wanfa_scoreList,
-                                            majorDimension=1, style=wx.RA_SPECIFY_ROWS)
-        Wanfa.Add(self.comboWanfa, 0, wx.ALL | wx.EXPAND, 20)
-        Wanfa.Add(self.Wanfa_scorebox, 0, wx.ALL | wx.EXPAND, 5)
-        self.sizer.Add(Wanfa)
-
-        # 其他这个小框
-        Qita = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.listQita = ['']
-        self.getListQita()
-        self.comboQita = wx.ComboBox(self, choices=self.listQita, size=(100,10),style=wx.CB_READONLY)
-        self.comboQita.SetSelection(0)
-
-        self.Qita_scoreList = ['-2', '-1', '0', '1', '2', '3']
-        self.Qita_scorebox = wx.RadioBox(self, label='其他', choices=self.Qita_scoreList,
-                                          majorDimension=1, style=wx.RA_SPECIFY_ROWS)
-        Qita.Add(self.comboQita, 0, wx.ALL | wx.EXPAND, 20)
-        Qita.Add(self.Qita_scorebox, 0, wx.ALL | wx.EXPAND, 5)
-        self.sizer.Add(Qita)
+        # # 服装这个小框
+        # Fuzhuang = wx.BoxSizer(wx.HORIZONTAL)
+        #
+        # self.listFuzhuang = ['']
+        # self.getListFuzhuang()
+        # self.comboFuzhuang = wx.ComboBox(self, choices=self.listFuzhuang, size=(100,10),style=wx.CB_READONLY)
+        # self.comboFuzhuang.SetSelection(0)
+        #
+        # self.Fuzhuang_scoreList = ['-2', '-1', '0', '1', '2', '3']
+        # self.Fuzhuang_scorebox = wx.RadioBox(self, label='服装', choices=self.Fuzhuang_scoreList,
+        #                                   majorDimension=1, style=wx.RA_SPECIFY_ROWS)
+        # Fuzhuang.Add(self.comboFuzhuang, 0, wx.ALL | wx.EXPAND, 20)
+        # Fuzhuang.Add(self.Fuzhuang_scorebox, 0, wx.ALL | wx.EXPAND, 5)
+        # self.sizer.Add(Fuzhuang)
+        #
+        # # 体型这个小框
+        # Tixing = wx.BoxSizer(wx.HORIZONTAL)
+        #
+        # self.listTixing = ['']
+        # self.getListTixing()
+        # self.comboTixing = wx.ComboBox(self, choices=self.listTixing, size=(100,10),style=wx.CB_READONLY)
+        # self.comboTixing.SetSelection(0)
+        #
+        # self.Tixing_scoreList = ['-2', '-1', '0', '1', '2', '3']
+        # self.Tixing_scorebox = wx.RadioBox(self, label='体型', choices=self.Tixing_scoreList,
+        #                                      majorDimension=1, style=wx.RA_SPECIFY_ROWS)
+        # Tixing.Add(self.comboTixing, 0, wx.ALL | wx.EXPAND,20)
+        # Tixing.Add(self.Tixing_scorebox, 0, wx.ALL | wx.EXPAND, 5)
+        # self.sizer.Add(Tixing)
+        #
+        # # 行为这个小框
+        # Xingwei = wx.BoxSizer(wx.HORIZONTAL)
+        #
+        # self.listXingwei = ['']
+        # self.getListXingwei()
+        # self.comboXingwei = wx.ComboBox(self, choices=self.listXingwei, size=(100,10),style=wx.CB_READONLY)
+        # self.comboXingwei.SetSelection(0)
+        #
+        # self.Xingwei_scoreList = ['-2', '-1', '0', '1', '2', '3']
+        # self.Xingwei_scorebox = wx.RadioBox(self, label='行为', choices=self.Xingwei_scoreList,
+        #                                    majorDimension=1, style=wx.RA_SPECIFY_ROWS)
+        # Xingwei.Add(self.comboXingwei, 0, wx.ALL | wx.EXPAND, 20)
+        # Xingwei.Add(self.Xingwei_scorebox, 0, wx.ALL | wx.EXPAND, 5)
+        # self.sizer.Add(Xingwei)
+        #
+        # # 玩法这个小框
+        # Wanfa = wx.BoxSizer(wx.HORIZONTAL)
+        #
+        # self.listWanfa = ['']
+        # self.getListWanfa()
+        # self.comboWanfa = wx.ComboBox(self, choices=self.listWanfa, size=(100,10),style=wx.CB_READONLY)
+        # self.comboWanfa.SetSelection(0)
+        #
+        # self.Wanfa_scoreList = ['-2', '-1', '0', '1', '2', '3']
+        # self.Wanfa_scorebox = wx.RadioBox(self, label='玩法', choices=self.Wanfa_scoreList,
+        #                                     majorDimension=1, style=wx.RA_SPECIFY_ROWS)
+        # Wanfa.Add(self.comboWanfa, 0, wx.ALL | wx.EXPAND, 20)
+        # Wanfa.Add(self.Wanfa_scorebox, 0, wx.ALL | wx.EXPAND, 5)
+        # self.sizer.Add(Wanfa)
+        #
+        # # 其他这个小框
+        # Qita = wx.BoxSizer(wx.HORIZONTAL)
+        #
+        # self.listQita = ['']
+        # self.getListQita()
+        # self.comboQita = wx.ComboBox(self, choices=self.listQita, size=(100,10),style=wx.CB_READONLY)
+        # self.comboQita.SetSelection(0)
+        #
+        # self.Qita_scoreList = ['-2', '-1', '0', '1', '2', '3']
+        # self.Qita_scorebox = wx.RadioBox(self, label='其他', choices=self.Qita_scoreList,
+        #                                   majorDimension=1, style=wx.RA_SPECIFY_ROWS)
+        # Qita.Add(self.comboQita, 0, wx.ALL | wx.EXPAND, 20)
+        # Qita.Add(self.Qita_scorebox, 0, wx.ALL | wx.EXPAND, 5)
+        # self.sizer.Add(Qita)
 
 
 
         #如果是无码或者有码视频
-        if movie_type ==0 or movie_type==1:
-            sql_sel = "SELECT * FROM av_record WHERE fanhao = '" + self.fanhao + "'"
-            cur.execute(sql_sel)
-            av_info = cur.fetchall()
-            print(av_info)
+        # if movie_type ==0 or movie_type==1:
+        #     sql_sel = "SELECT * FROM av_record WHERE fanhao = '" + self.fanhao + "'"
+        #     cur.execute(sql_sel)
+        #     av_info = cur.fetchall()
+        #     print(av_info)
+        #
+        #     #获取各类别数量
+        #     if av_info[0][6] is None:
+        #         av_genres = ''
+        #     else:
+        #         av_genres = av_info[0][6]
+        #     new_av_genres = av_genres.split(',')
+        #     del new_av_genres[-1]
+        #     print(new_av_genres)
+        #     self.dict_genres = {}
+        #     for av_genre in new_av_genres:
+        #         if av_genre in self.listZhuti:
+        #             self.comboZhuti.SetValue(av_genre)
+        #         if av_genre in self.listJuese:
+        #             self.comboJuese.SetValue(av_genre)
+        #         if av_genre in self.listFuzhuang:
+        #             self.comboFuzhuang.SetValue(av_genre)
+        #         if av_genre in self.listTixing:
+        #             self.comboTixing.SetValue(av_genre)
+        #         if av_genre in self.listXingwei:
+        #             self.comboXingwei.SetValue(av_genre)
+        #         if av_genre in self.listWanfa:
+        #             self.comboWanfa.SetValue(av_genre)
+        #         if av_genre in self.listQita:
+        #             self.comboQita.SetValue(av_genre)
+        #
+        #     # 获取各演员数量
+        #     if av_info[0][7] is None:
+        #         av_stars = ''
+        #     else:
+        #         av_stars = av_info[0][7]
+        #         new_av_stars = av_stars.split(',')
+        #         del new_av_stars[-1]
+        #         print(new_av_stars)
+        #         self.dict_stars = {}
+        #         for av_star in new_av_stars:
+        #             self.dict_stars[av_star] = '0'
+        #             starList = ['-2', '-1', '0', '1', '2', '3']
+        #             starbox = wx.RadioBox(self, label=av_star, choices=starList,
+        #                                    majorDimension=1, style=wx.RA_SPECIFY_ROWS)
+        #             # 获取图片
+        #             path = 'G:/fun_finder/stars/' + av_star + '.jpg'
+        #             if os.path.exists(path) == False:
+        #                 print('先获取图片')
+        #                 def mdb_conn(password=""):
+        #                     # 功能：创建数据库连接 :param db_name: 数据库名称 :param db_name: 数据库密码，默认为空 :return: 返回数据库连接
+        #
+        #                     str = 'driver={Microsoft Access Driver (*.mdb)};PWD' + password + ";DBQ=fun.mdb"
+        #                     conn = pypyodbc.win_connect_mdb(str)
+        #                     return conn
+        #
+        #                 conn = mdb_conn()
+        #                 cur = conn.cursor()
+        #
+        #                 # 获取各种信息
+        #                 sql_sel = "SELECT * FROM av_stars WHERE star= '" + av_star + "'"
+        #                 cur.execute(sql_sel)
+        #                 star_info = cur.fetchall()
+        #                 print(star_info)
+        #                 star_name = star_info[0][1]
+        #                 star_pid = star_info[0][3]
+        #                 try:
+        #                     avatar_requ = requests.get(
+        #                     'https://pics.javbus.com/actress/' + str(star_pid) + '_a.jpg',timeout=4)
+        #                     print('正在下载图片' + star_name)
+        #                     string = 'stars/' + star_name + '.jpg'
+        #                     fp = open(string, 'wb')
+        #                     # 创建文件
+        #                     fp.write(avatar_requ.content)
+        #                     fp.close()
+        #                     print('图片已经下载' + star_name)
+        #                     image = wx.Image(path, wx.BITMAP_TYPE_JPEG)
+        #                     image = image.Scale(50, 50)
+        #                 except:
+        #                     image = wx.Image('G:/fun_finder/stars/nowprinting.gif', wx.BITMAP_TYPE_GIF)
+        #                     image = image.Scale(50, 50)
+        #             else:
+        #                 image = wx.Image(path, wx.BITMAP_TYPE_JPEG)
+        #                 try:
+        #                     image = image.Scale(50, 50)
+        #                 except:
+        #                     image = wx.Image('G:/fun_finder/stars/nowprinting.gif', wx.BITMAP_TYPE_GIF)
+        #                     image = image.Scale(50, 50)
+        #             bmp = wx.StaticBitmap(self, bitmap=image.ConvertToBitmap(),size=(120,50))
+        #             star_box=wx.BoxSizer(wx.HORIZONTAL)
+        #             star_box.Add(bmp,0,wx.ALL,10)
+        #             star_box.Add(starbox,0,wx.ALL,6)
+        #             self.sizer.Add(star_box)
+        #             starbox.Bind(wx.EVT_RADIOBOX, lambda evt, avStar=av_star: self.OnRadiogroupStar(evt, avStar))
 
-            #获取各类别数量
-            if av_info[0][6] is None:
-                av_genres = ''
-            else:
-                av_genres = av_info[0][6]
-            new_av_genres = av_genres.split(',')
-            del new_av_genres[-1]
-            print(new_av_genres)
-            self.dict_genres = {}
-            for av_genre in new_av_genres:
-                if av_genre in self.listZhuti:
-                    self.comboZhuti.SetValue(av_genre)
-                if av_genre in self.listJuese:
-                    self.comboJuese.SetValue(av_genre)
-                if av_genre in self.listFuzhuang:
-                    self.comboFuzhuang.SetValue(av_genre)
-                if av_genre in self.listTixing:
-                    self.comboTixing.SetValue(av_genre)
-                if av_genre in self.listXingwei:
-                    self.comboXingwei.SetValue(av_genre)
-                if av_genre in self.listWanfa:
-                    self.comboWanfa.SetValue(av_genre)
-                if av_genre in self.listQita:
-                    self.comboQita.SetValue(av_genre)
 
-            # 获取各演员数量
-            if av_info[0][7] is None:
-                av_stars = ''
-            else:
-                av_stars = av_info[0][7]
-                new_av_stars = av_stars.split(',')
-                del new_av_stars[-1]
-                print(new_av_stars)
-                self.dict_stars = {}
-                for av_star in new_av_stars:
-                    self.dict_stars[av_star] = '0'
-                    starList = ['-2', '-1', '0', '1', '2', '3']
-                    starbox = wx.RadioBox(self, label=av_star, choices=starList,
-                                           majorDimension=1, style=wx.RA_SPECIFY_ROWS)
-                    # 获取图片
-                    path = 'G:/fun_finder/stars/' + av_star + '.jpg'
-                    if os.path.exists(path) == False:
-                        print('先获取图片')
-                        def mdb_conn(password=""):
-                            # 功能：创建数据库连接 :param db_name: 数据库名称 :param db_name: 数据库密码，默认为空 :return: 返回数据库连接
-
-                            str = 'driver={Microsoft Access Driver (*.mdb)};PWD' + password + ";DBQ=fun.mdb"
-                            conn = pypyodbc.win_connect_mdb(str)
-                            return conn
-
-                        conn = mdb_conn()
-                        cur = conn.cursor()
-
-                        # 获取各种信息
-                        sql_sel = "SELECT * FROM av_stars WHERE star= '" + av_star + "'"
-                        cur.execute(sql_sel)
-                        star_info = cur.fetchall()
-                        print(star_info)
-                        star_name = star_info[0][1]
-                        star_pid = star_info[0][3]
-                        try:
-                            avatar_requ = requests.get(
-                            'https://pics.javbus.com/actress/' + str(star_pid) + '_a.jpg',timeout=4)
-                            print('正在下载图片' + star_name)
-                            string = 'stars/' + star_name + '.jpg'
-                            fp = open(string, 'wb')
-                            # 创建文件
-                            fp.write(avatar_requ.content)
-                            fp.close()
-                            print('图片已经下载' + star_name)
-                            image = wx.Image(path, wx.BITMAP_TYPE_JPEG)
-                            image = image.Scale(50, 50)
-                        except:
-                            image = wx.Image('G:/fun_finder/stars/nowprinting.gif', wx.BITMAP_TYPE_GIF)
-                            image = image.Scale(50, 50)
-                    else:
-                        image = wx.Image(path, wx.BITMAP_TYPE_JPEG)
-                        try:
-                            image = image.Scale(50, 50)
-                        except:
-                            image = wx.Image('G:/fun_finder/stars/nowprinting.gif', wx.BITMAP_TYPE_GIF)
-                            image = image.Scale(50, 50)
-                    bmp = wx.StaticBitmap(self, bitmap=image.ConvertToBitmap(),size=(120,50))
-                    star_box=wx.BoxSizer(wx.HORIZONTAL)
-                    star_box.Add(bmp,0,wx.ALL,10)
-                    star_box.Add(starbox,0,wx.ALL,6)
-                    self.sizer.Add(star_box)
-                    starbox.Bind(wx.EVT_RADIOBOX, lambda evt, avStar=av_star: self.OnRadiogroupStar(evt, avStar))
-
-
-            self.conSizer.Add(self.sizer)
-
-            hbox = wx.BoxSizer(wx.HORIZONTAL)
-            self.lastPlayed = wx.CheckBox(self, label='刚看完')
-            self.btnComment = wx.Button(self, label='评分', size=(100, 30))
-            self.btnComment.Bind(wx.EVT_BUTTON, self.onClickComment)
-            hbox.Add(self.lastPlayed,0,wx.TOP,5)
-            hbox.Add(self.btnComment, 0, wx.ALIGN_CENTER_HORIZONTAL, 10)
-            self.conSizer.Add(hbox,0,wx.ALL|wx.ALIGN_CENTER_HORIZONTAL,10)
-        elif movie_type == 2:
-            sql_sel = "SELECT * FROM west_record WHERE movie_name = '" + self.fanhao + "'"
-            cur.execute(sql_sel)
-            av_info = cur.fetchall()
-            print(av_info)
-
-            # 获取各类别数量
-            if av_info[0][5] is None:
-                av_genres = ''
-            else:
-                av_genres = av_info[0][5]
-            new_av_genres = av_genres.split(',')
-            del new_av_genres[-1]
-            print(new_av_genres)
-            self.dict_genres = {}
-            row_genre = 0
-            for av_genre in new_av_genres:
-                self.dict_genres[av_genre] = '0'
-                genreList = ['-2', '-1', '0', '1', '2', '3']
-                genrebox = wx.RadioBox(self, label=av_genre, choices=genreList,
-                                       majorDimension=1, style=wx.RA_SPECIFY_ROWS)
-                self.sizer.Add(genrebox,0,wx.ALIGN_RIGHT)
-                row_genre = row_genre + 1
-                genrebox.Bind(wx.EVT_RADIOBOX, lambda evt, avGenre=av_genre: self.OnRadiogroupGenre(evt, avGenre))
-
-            # 获取各演员数量
-            if av_info[0][6] is None:
-                av_stars = ''
-            else:
-                av_stars = av_info[0][6]
-                new_av_stars = av_stars.split(',')
-                del new_av_stars[-1]
-                print(new_av_stars)
-                self.dict_stars = {}
-                for av_star in new_av_stars:
-                    self.dict_stars[av_star] = '0'
-                    starList = ['-2', '-1', '0', '1', '2', '3']
-                    starbox = wx.RadioBox(self, label=av_star, choices=starList,
-                                          majorDimension=1, style=wx.RA_SPECIFY_ROWS)
-                    # 获取图片
-                    path = 'G:/fun_finder/stars/' + av_star + '.jpg'
-                    if os.path.exists(path) == False:
-                        print('先获取图片')
-
-                        def mdb_conn(password=""):
-                            # 功能：创建数据库连接 :param db_name: 数据库名称 :param db_name: 数据库密码，默认为空 :return: 返回数据库连接
-
-                            str = 'driver={Microsoft Access Driver (*.mdb)};PWD' + password + ";DBQ=fun.mdb"
-                            conn = pypyodbc.win_connect_mdb(str)
-                            return conn
-
-                        conn = mdb_conn()
-                        cur = conn.cursor()
-
-                        # 获取各种信息
-                        sql_sel = "SELECT * FROM av_stars WHERE star= '" + av_star + "'"
-                        cur.execute(sql_sel)
-                        star_info = cur.fetchall()
-                        star_name = star_info[0][1]
-                        star_pid = star_info[0][3]
-                        headers = {'content-type': 'application/json',
-                                   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
-
-                        star_requ=requests.get(star_pid,headers=headers).content
-                        print(star_requ)
-                        avatar_soup =  BeautifulSoup(star_requ, 'html.parser', from_encoding='utf-8')
-                        avatar_url = avatar_soup.find('img',class_='noborder')
-                        print(avatar_url)
-                        if avatar_url is not None:
-                            avatar_url = avatar_url.get('src')
-                            avatar_requ = requests.get(avatar_url,headers=headers)
-                            print('正在下载图片' + star_name)
-                            string = 'stars/' + star_name + '.jpg'
-                            fp = open(string, 'wb')
-                            # 创建文件
-                            fp.write(avatar_requ.content)
-                            fp.close()
-                            print('图片已经下载' + star_name)
-                    image = wx.Image(path, wx.BITMAP_TYPE_JPEG)
-                    try:
-                        image = image.Scale(50, 50)
-                    except:
-                        image = wx.Image('G:/fun_finder/stars/nowprinting.gif', wx.BITMAP_TYPE_GIF)
-                        image = image.Scale(50, 50)
-                    bmp = wx.StaticBitmap(self, bitmap=image.ConvertToBitmap())
-                    star_box = wx.BoxSizer(wx.HORIZONTAL)
-                    star_box.Add(bmp, 0, wx.ALL, 7)
-                    star_box.Add(starbox)
-                    self.sizer.Add(star_box)
-                    starbox.Bind(wx.EVT_RADIOBOX, lambda evt, avStar=av_star: self.OnRadiogroupStar(evt, avStar))
+        #     self.conSizer.Add(self.sizer)
+        #
+        #     hbox = wx.BoxSizer(wx.HORIZONTAL)
+        #     self.lastPlayed = wx.CheckBox(self, label='刚看完')
+        #     self.btnComment = wx.Button(self, label='评分', size=(100, 30))
+        #     self.btnComment.Bind(wx.EVT_BUTTON, self.onClickComment)
+        #     hbox.Add(self.lastPlayed,0,wx.TOP,5)
+        #     hbox.Add(self.btnComment, 0, wx.ALIGN_CENTER_HORIZONTAL, 10)
+        #     self.conSizer.Add(hbox,0,wx.ALL|wx.ALIGN_CENTER_HORIZONTAL,10)
+        # elif movie_type == 2:
+        #     sql_sel = "SELECT * FROM west_record WHERE movie_name = '" + self.fanhao + "'"
+        #     cur.execute(sql_sel)
+        #     av_info = cur.fetchall()
+        #     print(av_info)
+        #
+        #     # 获取各类别数量
+        #     if av_info[0][5] is None:
+        #         av_genres = ''
+        #     else:
+        #         av_genres = av_info[0][5]
+        #     new_av_genres = av_genres.split(',')
+        #     del new_av_genres[-1]
+        #     print(new_av_genres)
+        #     self.dict_genres = {}
+        #     row_genre = 0
+        #     for av_genre in new_av_genres:
+        #         self.dict_genres[av_genre] = '0'
+        #         genreList = ['-2', '-1', '0', '1', '2', '3']
+        #         genrebox = wx.RadioBox(self, label=av_genre, choices=genreList,
+        #                                majorDimension=1, style=wx.RA_SPECIFY_ROWS)
+        #         self.sizer.Add(genrebox,0,wx.ALIGN_RIGHT)
+        #         row_genre = row_genre + 1
+        #         genrebox.Bind(wx.EVT_RADIOBOX, lambda evt, avGenre=av_genre: self.OnRadiogroupGenre(evt, avGenre))
+        #
+        #     # 获取各演员数量
+        #     if av_info[0][6] is None:
+        #         av_stars = ''
+        #     else:
+        #         av_stars = av_info[0][6]
+        #         new_av_stars = av_stars.split(',')
+        #         del new_av_stars[-1]
+        #         print(new_av_stars)
+        #         self.dict_stars = {}
+        #         for av_star in new_av_stars:
+        #             self.dict_stars[av_star] = '0'
+        #             starList = ['-2', '-1', '0', '1', '2', '3']
+        #             starbox = wx.RadioBox(self, label=av_star, choices=starList,
+        #                                   majorDimension=1, style=wx.RA_SPECIFY_ROWS)
+        #             # 获取图片
+        #             path = 'G:/fun_finder/stars/' + av_star + '.jpg'
+        #             if os.path.exists(path) == False:
+        #                 print('先获取图片')
+        #
+        #                 def mdb_conn(password=""):
+        #                     # 功能：创建数据库连接 :param db_name: 数据库名称 :param db_name: 数据库密码，默认为空 :return: 返回数据库连接
+        #
+        #                     str = 'driver={Microsoft Access Driver (*.mdb)};PWD' + password + ";DBQ=fun.mdb"
+        #                     conn = pypyodbc.win_connect_mdb(str)
+        #                     return conn
+        #
+        #                 conn = mdb_conn()
+        #                 cur = conn.cursor()
+        #
+        #                 # 获取各种信息
+        #                 sql_sel = "SELECT * FROM av_stars WHERE star= '" + av_star + "'"
+        #                 cur.execute(sql_sel)
+        #                 star_info = cur.fetchall()
+        #                 star_name = star_info[0][1]
+        #                 star_pid = star_info[0][3]
+        #                 headers = {'content-type': 'application/json',
+        #                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+        #
+        #                 star_requ=requests.get(star_pid,headers=headers).content
+        #                 print(star_requ)
+        #                 avatar_soup =  BeautifulSoup(star_requ, 'html.parser', from_encoding='utf-8')
+        #                 avatar_url = avatar_soup.find('img',class_='noborder')
+        #                 print(avatar_url)
+        #                 if avatar_url is not None:
+        #                     avatar_url = avatar_url.get('src')
+        #                     avatar_requ = requests.get(avatar_url,headers=headers)
+        #                     print('正在下载图片' + star_name)
+        #                     string = 'stars/' + star_name + '.jpg'
+        #                     fp = open(string, 'wb')
+        #                     # 创建文件
+        #                     fp.write(avatar_requ.content)
+        #                     fp.close()
+        #                     print('图片已经下载' + star_name)
+        #             image = wx.Image(path, wx.BITMAP_TYPE_JPEG)
+        #             try:
+        #                 image = image.Scale(50, 50)
+        #             except:
+        #                 image = wx.Image('G:/fun_finder/stars/nowprinting.gif', wx.BITMAP_TYPE_GIF)
+        #                 image = image.Scale(50, 50)
+        #             bmp = wx.StaticBitmap(self, bitmap=image.ConvertToBitmap())
+        #             star_box = wx.BoxSizer(wx.HORIZONTAL)
+        #             star_box.Add(bmp, 0, wx.ALL, 7)
+        #             star_box.Add(starbox)
+        #             self.sizer.Add(star_box)
+        #             starbox.Bind(wx.EVT_RADIOBOX, lambda evt, avStar=av_star: self.OnRadiogroupStar(evt, avStar))
 
             # 获取导演数量
             # if av_info[0][2] == '':
@@ -349,33 +358,37 @@ class CommentDialog(wx.Dialog):
             #     self.sizer.Add(self.directorbox,0,wx.ALIGN_RIGHT )
             #     self.Bind(wx.EVT_RADIOBUTTON, self.OnRadiogroupDirector)
 
-            self.conSizer.Add(self.sizer)
-
-            hbox = wx.BoxSizer(wx.HORIZONTAL)
-            self.lastPlayed = wx.CheckBox(self, label='刚看完')
-            self.btnComment = wx.Button(self, label='评分', size=(100, 30))
-            self.btnComment.Bind(wx.EVT_BUTTON, self.onClickComment)
-            hbox.Add(self.lastPlayed, 0, wx.TOP, 5)
-            hbox.Add(self.btnComment, 0, wx.ALIGN_CENTER_HORIZONTAL, 10)
-            self.conSizer.Add(hbox, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 10)
+        self.conSizer.Add(self.sizer)
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
+        self.lastPlayed = wx.CheckBox(self, label='刚看完')
+        self.btnComment = wx.Button(self, label='评分', size=(100, 30))
+        self.btnComment.Bind(wx.EVT_BUTTON, self.onClickComment)
+        hbox.Add(self.lastPlayed, 0, wx.TOP, 5)
+        hbox.Add(self.btnComment, 0, wx.ALIGN_CENTER_HORIZONTAL, 10)
+        self.conSizer.Add(hbox, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 10)
 
         self.SetSizer(self.conSizer)
         self.Fit()
         self.Center()
 
-    def OnRadiogroupDirector(self, e):
-        self.score_director = self.directorbox.GetStringSelection()
-        print(self.score_director)
+    def OnRadiogroupScore(self, e):
+        self.score = self.scorebox.GetStringSelection()
+        self.score = str(int(self.score)*100)
+        print(self.score)
 
-    def OnRadiogroupGenre(self, e,avGenre):
-        rb = e.GetEventObject()
-        self.dict_genres[avGenre] = rb.GetStringSelection()
-        print(self.dict_genres)
-
-    def OnRadiogroupStar(self, e, avStar):
-        rb = e.GetEventObject()
-        self.dict_stars[avStar] = rb.GetStringSelection()
-        print(self.dict_stars)
+    # def OnRadiogroupDirector(self, e):
+    #     self.score_director = self.directorbox.GetStringSelection()
+    #     print(self.score_director)
+    #
+    # def OnRadiogroupGenre(self, e,avGenre):
+    #     rb = e.GetEventObject()
+    #     self.dict_genres[avGenre] = rb.GetStringSelection()
+    #     print(self.dict_genres)
+    #
+    # def OnRadiogroupStar(self, e, avStar):
+    #     rb = e.GetEventObject()
+    #     self.dict_stars[avStar] = rb.GetStringSelection()
+    #     print(self.dict_stars)
 
     def onClickComment(self, event):
 
@@ -389,181 +402,23 @@ class CommentDialog(wx.Dialog):
         conn = mdb_conn()
         cur = conn.cursor()
 
-        # 获取各种信息
-        sql_sel = "SELECT * FROM av_record WHERE fanhao = '" + self.fanhao + "'"
+        # 更新播放时间
+        if self.lastPlayed.GetValue() == True:
+            now = datetime.datetime.now()
+            now = now.strftime('%Y-%m-%d %H:%M:%S')
+            sql_sel = "UPDATE av_record SET last='" + str(now) + "' WHERE fanhao = '" + self.fanhao + "'"
+            cur.execute(sql_sel)
+            conn.commit()
+            print('更新了播放时间')
+
+
+        # 更新评分
+        sql_sel = "UPDATE av_record SET score=0+'" + self.score + "' WHERE fanhao = '" + self.fanhao + "'"
+        print(sql_sel)
         cur.execute(sql_sel)
-        av_info = cur.fetchall()
-        print(av_info)
-        #如果是JAV
-        if av_info !=[]:
-            # 更新播放时间
+        conn.commit()
+        wx.MessageBox("评分更新完毕", "Message", wx.OK | wx.ICON_INFORMATION)
 
-            if self.lastPlayed.GetValue() == True:
-                now = datetime.datetime.now()
-                now = now.strftime('%Y-%m-%d %H:%M:%S')
-                sql_sel = "UPDATE av_record SET last='" + str(now) + "' WHERE fanhao = '" + self.fanhao + "'"
-                cur.execute(sql_sel)
-                conn.commit()
-                print('更新了播放时间')
-
-
-
-            # 获取各类别数量
-            new_av_genres = []
-            new_av_genres.append(self.comboZhuti.GetStringSelection())
-            new_av_genres.append(self.comboJuese.GetStringSelection())
-            new_av_genres.append(self.comboFuzhuang.GetStringSelection())
-            new_av_genres.append(self.comboTixing.GetStringSelection())
-            new_av_genres.append(self.comboXingwei.GetStringSelection())
-            new_av_genres.append(self.comboWanfa.GetStringSelection())
-            new_av_genres.append(self.comboQita.GetStringSelection())
-            new_av_score =[]
-            new_av_score.append(self.zhuti_scorebox.GetString(self.zhuti_scorebox.GetSelection()))
-            new_av_score.append(self.Juese_scorebox.GetString(self.Juese_scorebox.GetSelection()))
-            new_av_score.append(self.Fuzhuang_scorebox.GetString(self.Fuzhuang_scorebox.GetSelection()))
-            new_av_score.append(self.Tixing_scorebox.GetString(self.Tixing_scorebox.GetSelection()))
-            new_av_score.append(self.Xingwei_scorebox.GetString(self.Xingwei_scorebox.GetSelection()))
-            new_av_score.append(self.Wanfa_scorebox.GetString(self.Wanfa_scorebox.GetSelection()))
-            new_av_score.append(self.Qita_scorebox.GetString(self.Qita_scorebox.GetSelection()))
-            print(new_av_genres)
-            print(new_av_score)
-            self.sum_score_genres = 0
-            i = 0
-            str_av_genres=''
-            for i in range(len(new_av_genres)):
-                if new_av_genres[i] != '':
-                    sql_sel = "UPDATE av_genres SET num='" + new_av_score[i] + "' WHERE genre = '" + new_av_genres[i] + "'"
-                    print(sql_sel)
-                    cur.execute(sql_sel)
-                    conn.commit()
-                    print(new_av_genres[i] + '类别数量更新：' + new_av_score[i])
-                    self.sum_score_genres += int(new_av_score[i])
-                    str_av_genres += new_av_genres[i]+','
-
-            sql_sel = "UPDATE av_record SET genre='" +str_av_genres+"' WHERE fanhao = '" + self.fanhao + "'"
-            print(sql_sel)
-            cur.execute(sql_sel)
-            conn.commit()
-            print(new_av_genres[i] + '类别数量更新：' + new_av_score[i])
-            self.sum_score_genres += int(new_av_score[i])
-
-            # 获取各演员数量
-            av_stars = av_info[0][7]
-            new_av_stars = av_stars.split(',')
-            del new_av_stars[-1]
-            print(new_av_stars)
-            self.sum_score_stars = 0
-            for av_star in new_av_stars:
-                sql_sel = "UPDATE  av_stars SET num='" + self.dict_stars[av_star] + "' WHERE star = '" + av_star + "'"
-                print(sql_sel)
-                cur.execute(sql_sel)
-                conn.commit()
-                print(av_star + '数量更新：' + self.dict_stars[av_star])
-                self.sum_score_stars += int(self.dict_stars[av_star])
-
-
-            self.score = (int(self.sum_score_stars)+int(self.sum_score_genres))/(1+len(self.dict_genres)+len(self.dict_stars))
-
-            # 获取制作商数量
-            av_zhizuo = av_info[0][4]
-            sql_sel = "UPDATE av_zhizuo SET num=num+'" + str(self.score) + "'/num WHERE zhizuo = '" + av_zhizuo + "'"
-            cur.execute(sql_sel)
-            conn.commit()
-            print('制作商数量更新：' + str(self.score))
-
-            # 获取系列数量
-            if av_info[0][5] is not None:
-                av_xilie = av_info[0][5]
-                sql_sel = "UPDATE av_xilie SET num=num+'" + str(self.score) + "'/num WHERE xilie = '" + av_xilie + "'"
-            cur.execute(sql_sel)
-            conn.commit()
-            print('系列数量更新：' + str(self.score))
-
-            # 如果是-2分，则删除记录和内容
-            if self.score == '-2':
-                sql_sel = "DELETE FROM av_record WHERE fanhao = '" + self.fanhao + "'"
-                cur.execute(sql_sel)
-                conn.commit()
-                print('记录已经删除')
-            cur.close()
-            conn.close()
-            wx.MessageBox("评分更新完毕", "Message", wx.OK | wx.ICON_INFORMATION)
-        #如果是欧美
-        else:
-            sql_sel = "SELECT * FROM west_record WHERE movie_name = '" + self.fanhao + "'"
-            cur.execute(sql_sel)
-            av_info = cur.fetchall()
-            print(av_info)
-
-            # 更新播放时间
-            if self.lastPlayed.GetValue() == True:
-                now = datetime.datetime.now()
-                now = now.strftime('%Y-%m-%d %H:%M:%S')
-                sql_sel = "UPDATE west_record SET last='" + str(now) + "' WHERE movie_name = '" + self.fanhao + "'"
-                cur.execute(sql_sel)
-                conn.commit()
-                print('更新了播放时间')
-
-            # 获取导演数量
-            if self.score_director != '0':
-                sql_sel = "UPDATE av_director SET num=num+'" + self.score_director + "' WHERE director = '" + self.av_director + "'"
-                cur.execute(sql_sel)
-                conn.commit()
-                print('导演数量更新：' + self.score_director)
-
-            # 获取各类别数量
-            av_genres = av_info[0][5]
-            new_av_genres = av_genres.split(',')
-            del new_av_genres[-1]
-            print(new_av_genres)
-            self.sum_score_genres = 0
-            for av_genre in new_av_genres:
-                sql_sel = "UPDATE av_genres SET num=num+'" + self.dict_genres[
-                    av_genre] + "' WHERE genre = '" + av_genre + "'"
-                cur.execute(sql_sel)
-                conn.commit()
-                print(av_genre + '类别数量更新：' + self.dict_genres[av_genre])
-                self.sum_score_genres += int(self.dict_genres[av_genre])
-
-            # 获取各演员数量
-            av_stars = av_info[0][6]
-            new_av_stars = av_stars.split(',')
-            del new_av_stars[-1]
-            print(new_av_stars)
-            self.sum_score_stars = 0
-            for av_star in new_av_stars:
-                sql_sel = "UPDATE  av_stars SET num=num+'" + self.dict_stars[
-                    av_star] + "' WHERE star = '" + av_star + "'"
-                cur.execute(sql_sel)
-                conn.commit()
-                print(av_star + '数量更新：' + self.dict_stars[av_star])
-                self.sum_score_stars += int(self.dict_stars[av_star])
-
-            self.score = (int(self.score_director) + int(self.sum_score_stars) + int(self.sum_score_genres)) / (
-            1 + len(self.dict_genres) + len(self.dict_stars))
-            # 获取制作商数量
-            av_zhizuo = av_info[0][3]
-            sql_sel = "UPDATE av_zhizuo SET num=num+'" + str(self.score) + "' WHERE zhizuo = '" + av_zhizuo + "'"
-            cur.execute(sql_sel)
-            conn.commit()
-            print('制作商数量更新：' + str(self.score))
-
-            # 获取系列数量
-            av_xilie = av_info[0][4]
-            sql_sel = "UPDATE av_xilie SET num=num+'" + str(self.score) + "' WHERE xilie = '" + av_xilie + "'"
-            cur.execute(sql_sel)
-            conn.commit()
-            print('系列数量更新：' + str(self.score))
-
-            # 如果是-2分，则删除记录和内容
-            if self.score == '-2':
-                sql_sel = "DELETE FROM av_record WHERE ID = '" + self.fanhao + "'"
-                cur.execute(sql_sel)
-                conn.commit()
-                print('记录已经删除')
-            cur.close()
-            conn.close()
-            wx.MessageBox("评分更新完毕", "Message", wx.OK | wx.ICON_INFORMATION)
 
     # 获取主题列表
     def getListZhuti(self):
